@@ -1,6 +1,6 @@
 # Frank with custom code and VS Code integration
 
-This project demonstrates two features of the Frank!Runner. First, you see how you can add custom Java code to your project. Second, you see integration with Visual Studio Code, allowing you to start the Frank!Runner from this development environment.
+This project (remember that it would be an independent Git repository in a real development project) demonstrates two features of the Frank!Runner. First, you see how you can add custom Java code to your project. Second, you see integration with Visual Studio Code, allowing you to start the Frank!Runner from this development environment.
 
 ## A Frank, not a config
 
