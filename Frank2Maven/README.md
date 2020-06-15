@@ -16,7 +16,7 @@ However, many existing Franks do not use the new directory structure. They are J
 
 For small projects, it is feasible to call the Java compiler directly to get your ".class" files, but for large projects this would be very complicated. The Java compiler has to be called with many arguments. Maven is a tool that automates the compilation of Java projects. A Maven project should have an XML file called "pom.xml" that provides configuration settings about your development project. Maven projects have a fixed directory structure; only deviations from this fixed directory structure have to be configured in pom.xml. This fixed directory structure is not compatible with the directory structure explained in the Frank!Manual. With the Maven directory structure, you usually loose the distinction between a Frank and a Frank config. Therefore a Maven project contains a Frank, not a Frank config.
 
-Please note that WeAreFrank! developed a more complicated project structure in which custom code is possible AND in which you have one Frank config per project. This structure is beyond the scope of the present project, but you can find more information in the README.md file of the Frank!Runner, https://github.com/ibissource/frank-runner.
+WeAreFrank! developed a more complicated project structure in which custom code is possible AND in which you have one Frank config per project. This structure is explained in the subprojects "Frank2MultiConfig" and "Frank2MultiConfig_config".
 
 The Frank!Runner checks whether your project contains a file named `pom.xml` at your project root. If so, your project is recognized as a Maven project.
 

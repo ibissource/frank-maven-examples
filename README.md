@@ -25,7 +25,6 @@ Please do the following to work with the projects inside this git repository:
 ## TODO
 
 * TODO: Move ibisdoc.xsd to a common location.
-* TODO: Make a better archive from Frank2Maven.
 * TODO: In Frank2Maven, Frank2MultiConfig is not properly referenced.
 * TODO: In Frank2Maven's README, explain CI/CD.
 * TODO: In Frank2Maven's README, explain that custom code is always common to all configs.
