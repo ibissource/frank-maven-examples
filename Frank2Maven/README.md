@@ -1,46 +1,110 @@
-# Frank with custom code and VS Code integration
+# Frank2Maven
 
-This project (remember that it would be an independent Git repository in a real development project) demonstrates two features of the Frank!Runner. First, you see how you can add custom Java code to your project. Second, you see integration with Visual Studio Code, allowing you to start the Frank!Runner from this development environment.
+## Directory structure
 
-## A Frank, not a config
+In general, this directory structure is as follows:
 
-The Frank!Manual makes a clear distinction between Franks and Frank configs, see https://frank-manual.readthedocs.io/en/latest/gettingStarted/examineExample.html. The combination of all configuration files provided to the Frank!Runner is a Frank. Frank developers create Frank configs, which are independent of the Frank!Framework instance to which they are deployed.
+    pom.xml - Configuration file for Maven. The Frank!Runner recognizes this directory structure when it sees this file.
+    |- src/main/java - Custom Java classes.
+    |- src/main/configurations
+       |- custom
+          |- Configuration.xml
+    |- build.xml - For integration with your development environment
 
-But... This project is not a Frank!Config, but a Frank! This may be confusing. The reason has to do with the history of the Frank!Framework. The Frank!Framework started as a Java project, making no distinction between the Frank!Framework sources and Frank configs. When you developed, you typically compiled the Java sources while deploying your Frank.
+The Frank!Runner checks whether your project contains a file named `pom.xml` at your project root. If so, the Frank!Runner assumes that the directory structure is as shown.
 
-Compiling Java sources during the development process required a complicated development environment. Therefore, WeAreFrank! introduced the Frank!Runner, see https://github.com/ibissource/frank-runner. This project automates downloading Apache Tomcat and deploying the Frank!Framework, introducing a clear distinction between a Frank and a Frank config.
+## History
 
-The Frank!Runner expresses this distinction by introducing the `classes`, `configurations` and `tests` directories as explained in the README.md file of the Frank!Runner, https://github.com/ibissource/frank-runner. This directory structure is also explained in the Frank!Manual. Frank developers create Frank configs, which are deployed as subdirectories of the `configurations` directory.
+This is first directory structure for Frank development that uses the build tool Maven.
 
-However, many existing Franks do not use the new directory structure. They are Java projects that use Maven. The words "Java" and "Maven" require more explanation. Java is a programming language that reads text files with extensions ".java". These text files need to be compiled using the Java compiler called "javac". The Java compiler reads the ".java" files and produces binary files with extension ".class". These Java class files can be executed by your application server. The Frank!Framework can work with multiple application servers, but when you use the Frank!Runner you always use Apache Tomcat as your application server.
+## Frank vs Frank config
 
-For small projects, it is feasible to call the Java compiler directly to get your ".class" files, but for large projects this would be very complicated. The Java compiler has to be called with many arguments. Maven is a tool that automates the compilation of Java projects. A Maven project should have an XML file called "pom.xml" that provides configuration settings about your development project. Maven projects have a fixed directory structure; only deviations from this fixed directory structure have to be configured in pom.xml. This fixed directory structure is not compatible with the directory structure explained in the Frank!Manual. With the Maven directory structure, you usually loose the distinction between a Frank and a Frank config. Therefore a Maven project contains a Frank, not a Frank config.
+With this directory structure, your project will hold a Frank. You include multiple Frank configurations within the same Git repository. Your build results in a single artifact that holds all the configurations.
 
-WeAreFrank! developed a more complicated project structure in which custom code is possible AND in which you have one Frank config per project. This structure is explained in the subprojects "Frank2MultiConfig" and "Frank2MultiConfig_config".
+## Running with Frank!Runner
 
-The Frank!Runner checks whether your project contains a file named `pom.xml` at your project root. If so, your project is recognized as a Maven project.
+Your project needs to include file `build.xml` with the contents given in the README.md file of the frank-runner. Follow the instructions given with the Frank!Runner to setup your development environment. You can then start your project from your development environment, either Eclipse or Visual Studio Code.
 
-## Directory structure and VSCode integration
+## Built artifact
 
-This project demonstrates the directory structure of a Maven project with Frank configs. Of course, you have a file pom.xml. Maven projects have Java source code in directory "src/main/java". Maven projects also have unit tests, which are Java classes that perform tests on parts of the production Java code. These tests are in "src/test/java".
+Building your project produces a web application (file extension .war). Both the Frank!Framework and your configurations are included.
 
-The Frank!Runner expects your Frank configs in directory "src/main/configurations", each Frank config appearing as a subdirectory. More details can be found in the README.md file of the Frank!Runner GitHub repository: https://github.com/ibissource/frank-runner. That README.md file also explains how to get integration with Visual Studio Code. This integration is achieved using the file build.xml within the present project.
+## Build process
 
-## What the Frank!Runner does
+To build this example, go to directory `Frank2Maven`. In general: the directory that holds your `pom.xml` file. Then run `mvn clean install`.
 
-The Frank!Runner was designed to simplify executing Franks. This has been achieved by limiting the number of tools being used under the hood. The Frank!Runner therefore does not use Maven to compile your Java sources. Instead, the Frank!Runner uses another tool that can be used to automate the build, which is Apache Ant.
+## Explanation of the example pom.xml
 
-The Frank!Runner does the following:
+At the top, you see a `<packaging>war</packaging>`. This tells Maven that it has to build a .war file. One of the dependencies is:
+
+    <dependency>
+      <groupId>org.ibissource</groupId>
+      <artifactId>ibis-adapterframework-webapp</artifactId>
+      <version>${ffVersion}</version>
+      <type>war</type>
+    </dependency>
+
+This dependency grabs the Web application of the Frank!Framework. It says `<type>war</type>` to specify that this dependency is not a .jar, but a web application. Dependencies with type `war` are not transitive, which means that you do not get the Java classes. The `ibis-adapterframework-webapp` artifact does not hold any Java code. The Java code only appears in its dependencies. The Java classes of the Frank!Framework are grabbed with the following dependency:
+
+    <dependency>
+      <groupId>org.ibissource</groupId>
+      <artifactId>ibis-adapterframework-core</artifactId>
+      <version>${ffVersion}</version>
+    </dependency>
+
+This is an ordinary dependency, so transitive. All dependencies of the Frank!Framework source code are included in the web application.
+
+Finally, the `pom.xml` should put your files in `src/main/configurations` on the Java classpath. This is the purpose of the lower part:
+
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+      </plugins>
+      <resources>
+        <resource>
+          <directory>src/main/configurations</directory>
+        </resource>
+      </resources>
+    </build>
+
+This example contains a custom Java class. This class is handled automatically by Maven without the need for further configuration.
+
+In your own project, you may extend this `pom.xml` to include deploying your artifact. Then you need to build with `mvn clean deploy`.
+
+## Artifact deployment
+
+After building, you can deploy this example as follows:
 
 * Download Apache Tomcat.
-* Download the compiled Frank!Framework (file with extension .war).
-* Grab some dependencies of all Java code being deployed.
-* Compile your Java sources, automating this compilation process with Ant instead of Maven.
-* Start Apache Tomcat, running all the Java code as a web application.
+* Put your .war file in the `webapps` folder.
+* Put the following extra files in your `lib` directory:
 
-It is important that the Frank!Runner does not use Maven to build your Java code. This means that the Frank!Runner does not use the configuration settings you made in the pom.xml file. Furthermore, the Frank!Runner does not execute the unit tests you have in "src/test/java".
+  * `activemq-core-5.6.0.jar`
+  * `geronimo-j2ee-management_1.1_spec-1.0.1.jar`
+  * `geronimo-jms_1.1_spec-1.1.1.jar`
+  * `geronimo-jta_1.1_spec-1.1.1.jar`
+  * `h2-1.4.200.jar` if you use a H2 database, otherwise you need the driver for your other database.
+  * `kahadb-5.6.0.jar`
+  * `service-dispatcher-1.5.jar`
 
-To run your unit tests, you may want to build your project using Maven. Installing and using Maven is beyond the scope of this README.md file. If you have Maven installed on your computer, you can do the following:
+  You can find these on Maven Central or at the site of your database vendor.
 
-* Change directory to the project root of this project.
-* On the command-line, execute `mvn install`.
+  TODO: Is this list enough for other projects?
+
+* Add the following to your `catalina.properties`:
+
+      instance.name=withCustom
+      dtap.stage= ... the DTAP stage you want ...
+      configurations.names=custom
+
+* Edit `conf/context.xml` to reference the database:
+
+      <Resource
+        name="jdbc/withcustom"
+        type="org.h2.jdbcx.JdbcDataSource"
+        factory="org.apache.naming.factory.BeanFactory"
+        URL="jdbc:h2:C: ... your Tomcat installation dir .../logs/withCustom" />
