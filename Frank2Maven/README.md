@@ -13,6 +13,12 @@ In general, this directory structure is as follows:
 
 The Frank!Runner checks whether your project contains a file named `pom.xml` at your project root. If so, the Frank!Runner assumes that the directory structure is as shown.
 
+## How to start?
+
+Some files contain boilerplate code that is hard to remember. To make a start, you can use the following Maven command: `mvn archetype:generate` and then type in artifactId `maven-archetype-quickstart`. Maven then asks you which artifact you mean, because you did not type the groupId. You need "org.apache.maven.archetypes:maven-archetype-quickstart". Then answer the other questions.
+
+Maven asks you to give a package name. This is a Java package name that is used to build a very simple Java application. Typically, the package name starts with "com.yourcompany" when the website of your company is "yourcompany.com". You reverse the words in the domain name of your company. Finally, remove the ".java" files that Maven created for you.
+
 ## History
 
 This is first directory structure for Frank development that uses the build tool Maven.
