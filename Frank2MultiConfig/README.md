@@ -70,19 +70,112 @@ The project "Frank2MultiConfig_config" holds a Frank config. The project "Frank2
 ## Running with Frank!Runner
 
 TODO: Write this.
-TODO: Move src/main/configuration to src/main/configuration/custom and remove the config for the maven-resource-plugin
 
 ## Built artifact
 
-Building Frank2MultiConfig produces two artifacts, a web application with extension `.war` and an Enterprise Archive with extension `.ear`. The `.ear` is meant for deployment on Websphere Application Server.
+Building Frank2MultiConfig produces two artifacts, a web application with extension `.war` and an Enterprise Archive with extension `.ear`. The `.ear` is meant for deployment on Websphere Application Server. Please note that no test was done about deploying the .ear artifact. We only checked that it has `application.xml` and that it contained the WAR archive.
 
 ## Build process
 
 To build Frank2MultiConfig, go to its directory and issue `mvn clean install -Drevision=1.0` on the command line. The property `revision` sets the common version number for all artifacts you are building here. To build Frank2MultiConfig_config, go to its directory and issue `mvn clean install` on a command line.
 
-## Explanation of the example pom.xml
+## Explanation of the example pom.xml files
 
-TODO: Explain how all the `pom.xml` files cooperate.
+The two POM files `Frank2MultiConfig/pom.xml` and `Frank2MultiConfig_config/pom.xml` show the basis you need to get the artifacts out of your CI/CD pipeline. In your own project, you probably want bigger POM files to customize your artifacts and to include deployment to your Nexus repository. The POM files you have here will be explained below.
+
+### Frank2MultiConfig/pom.xml
+
+The purpose of `Frank2MultiConfig/pom.xml` is to combine the builds of the `war` and the `ear` subdirectory into one execution of Maven. Without this file, you would have to invoke Maven separately to build these two subdirectories. The line `<packaging>pom</packaging>` tells Maven that this POM aggregates projects and does not itself build artifacts. The projects being aggregated are in the `<modules>` tag. They are referenced by subdirectory.
+
+When you call Maven from the `Frank2MultiConfig` directory, it will first analyze the referenced subprojects to determine the right order. For example, the subprojects may depend on each other, in which case the dependency is built before the dependent subproject. The Maven component doing this analysis is called the "reactor". You can Google this word if you want to know more.
+
+### Frank2MultiConfig/war/pom.xml
+
+Now we turn to `Frank2MultiConfig/war/pom.xml`. This one has `<packaging>war</packaging>`, indicate that this one builds the WAR file, the web application that can be deployed to Apache Tomcat. At the start, you see a `<parent>` tag:
+
+    <parent>
+      <artifactId>multi-config</artifactId>
+      <groupId>org.ibissource</groupId>
+      <version>${revision}</version>
+    </parent>
+
+This XML tells Maven that it should use many settings from `Frank2MultiConfig/pom.xml` when building `Frank2MultiConfig/war/pom.xml`. The settings from these two POM files are combined to get the effective configuration that Maven uses to build the WAR. Settings in the child POM have precedence over settings in the parent POM. With this inheritance relation in place, common configurations for the WAR and the EAR can be put in the parent POM. This inheritance is not essential, however. You could as well use another parent POM or no parent at all to build valid artifacts. It depends on the fine tuning you want.
+
+The following part is the same as in `Frank2Maven/pom.xml`
+
+    <dependency>
+      <groupId>org.ibissource</groupId>
+      <artifactId>ibis-adapterframework-webapp</artifactId>
+      <version>${ffVersion}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.ibissource</groupId>
+      <artifactId>ibis-adapterframework-core</artifactId>
+      <version>${ffVersion}</version>
+    </dependency>
+
+The top item with the line `<type>war</type>` grabs the web stuff from the Frank!Framework, but it is not transitive. This means that possible dependencies of artifact `ibis-adapterframework-webapp` are not considered. The bottom one adds Java classes of the Frank!Framework that your custom class `CustomPipe.java` needs. Maven packages WAR archives by including all Maven dependencies in the archive. This is different from packaging .jar files, which by default don't include the Maven dependencies.
+
+If you do not need an EAR, then Maven allows you to change `Frank2MultiConfig/pom.xml` to just build the WAR file, doing away with the aggregation. This is not supported by the Frank!Runner however.
+
+### Frank2MultiConfig/ear/pom.xml
+
+Next, we turn to `Frank2MultiConfig/ear/pom.xml`. It has the line `<packaging>ear</packaging>`, telling Maven that it has to build an EAR. The inheritance relation is repeated:
+
+    <parent>
+      <artifactId>multi-config</artifactId>
+      <groupId>org.ibissource</groupId>
+      <version>${revision}</version>
+    </parent>
+
+The EAR POM also inherits settngs from `Frank2MultiConfig/pom.xml`. The effective configuration used to build the EAR is obtained by combining `Frank2MultiConfig/pom.xml` and `Frank2MultiConfig/ear/pom.xml`.
+
+Next, you have:
+
+    <dependencies>
+      <dependency>
+        <groupId>org.ibissource</groupId>
+        <artifactId>multi-config-war</artifactId>
+        <type>war</type>
+        <version>${revision}</version>
+      </dependency>    
+    </dependencies>
+
+This states that your WAR has to be included in the EAR being configured.
+
+An EAR file is basically a .zip file that contains WAR files. The EAR file adds some configuration data, for example the context root of each included web application. It is the responsibility of the `maven-ear-plugin` Maven plugin to include the right files. To get the right metadata in your EAR archive, you need to configure the plugin as shown below:
+
+    <plugin>
+      <artifactId>maven-ear-plugin</artifactId>
+      <version>3.0.2</version>
+      <configuration>
+        <archive> 
+          <manifest> 
+            <addDefaultImplementationEntries>true</addDefaultImplementationEntries> 
+          </manifest> 
+          <manifestEntries>
+            <Ibis-Project>multi-config</Ibis-Project>
+          </manifestEntries> 
+        </archive> 
+        <modules>
+          <webModule>
+            <groupId>org.ibissource</groupId>
+            <artifactId>multi-config-war</artifactId>
+            <bundleFileName>multi-config.war</bundleFileName>
+            <contextRoot>/multi-config</contextRoot>
+          </webModule>
+        </modules>
+      </configuration>
+    </plugin>
+
+### Frank2MultiConfig_config/pom.xml
+
+Finally, we turn to `Frank2MultiConfig_config/pom.xml`. If this were your own project, directory `Frank2MultiConfig_config` would be a separate Git repository. Therefore, no aggregation is applied here. This POM just zips the files in `src/main/configuration`. This is not the default directory that Maven zips. Therefore, you need the `<resource>` tag as shown.
+
+    <resource>
+      <directory>src/main/configuration</directory>
+    </resource>
 
 ## Artifact deployment
 
