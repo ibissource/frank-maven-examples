@@ -1,0 +1,17 @@
+<project default="restart">
+	<target name="restartConfig">
+		<basename property="project.dir" file="${basedir}"/>
+		<split projectdir="${project.dir}"/>
+		<exec executable="../frank-runner/restart.bat" vmlauncher="false" failonerror="true">
+			<arg value="-Dmain.project=${main.project}"/>
+			<arg value="-Dsub.project=${sub.project}"/>
+		</exec>
+	</target>
+	<scriptdef language="javascript" name="split">
+		<attribute name="projectdir"/> 
+		var projectDir = attributes.get("projectdir");
+		var i = projectDir.indexOf('_');
+		project.setProperty("main.project", projectDir.substring(0, i));
+		project.setProperty("sub.project", projectDir.substring(i + 1));
+	</scriptdef>
+</project>

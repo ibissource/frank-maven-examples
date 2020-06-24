@@ -57,7 +57,7 @@ The second directory structure is the separate configuration:
        |--pom.xml
        |--restart.bat
 
-This structure is recognized by the presence of `pom.xml`.
+This structure is recognized by the presence of `pom.xml`. The Frank!Runner also expects that the name of the configuration matches the suffix in the project name. If the configuration is in the directory ``src/main/configuration/custom``, then the directory name of the Git project should be ``Frank2MultiConfig_custom`` (provided that the name of the main project is ``Frank2MultiConfig``).
 
 ## History
 
@@ -69,7 +69,7 @@ The project "Frank2MultiConfig_config" holds a Frank config. The project "Frank2
 
 ## Running with Frank!Runner
 
-TODO: Write this.
+You can run "Frank2MultiConfig_config" with the Frank!Runner. Please follow the instructions of the Frank!Runner README.md file to have integration with your development environment, either Eclipse or Visual Studio Code. We already supplied the "build.xml" and "frank-runner.properties" files you need. You can use these as examples within your own project.
 
 ## Built artifact
 

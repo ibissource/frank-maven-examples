@@ -19,7 +19,7 @@ class CustomPipe extends FixedForwardPipe {
             String msg = message.asString();
             int val = Integer.parseInt(msg);
             int result = val + ADDITION;
-            return new PipeRunResult(getForward(), (Object) Integer.valueOf(result));
+            return new PipeRunResult(getForward(), result);
         } catch(IOException e) {
             throw new PipeRunException(this, "An IOException occurred", e);
         }
