@@ -16,6 +16,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <ffVersion>7.6-20200619.094149</ffVersion>
+    <ffVersion>7.6-20200624.152104</ffVersion>
   </properties>
 </project>

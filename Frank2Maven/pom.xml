@@ -8,7 +8,7 @@
   <name>withCustom</name>
   <url>http://maven.apache.org</url>
   <properties>
-    <ffVersion>7.6-20200619.094149</ffVersion>
+    <ffVersion>7.6-20200624.152104</ffVersion>
   </properties>
   <dependencies>
     <dependency>
