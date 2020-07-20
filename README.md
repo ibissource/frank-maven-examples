@@ -22,7 +22,7 @@ Please do the following to work with the projects inside this git repository:
       |- Frank2MultiConfig
       |- Frank2MultiConfig_config
 
-* Put ibisdoc.xsd in every `src/main/java/configurations` and `src/main/java/configuration` folder. This way you will have XML schema validation when you open configuration files in your text editor.
+* Put ibisdoc.xsd in every `src/main/configurations` and `src/main/configuration` folder. This way you will have XML schema validation when you open configuration files in your text editor.
 
 ## Background
 
