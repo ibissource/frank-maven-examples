@@ -8,7 +8,8 @@
       <Pipeline firstPipe="customPipe">
           <pipe
               name="customPipe"
-              className="org.ibissource.custom.CustomPipe">
+              className="org.ibissource.custom.CustomPipe"
+              customAttribute="100">
               <Forward name="success" path="EXIT"/>
           </pipe>
           <Exit path="EXIT" state="success" code="200"/>
